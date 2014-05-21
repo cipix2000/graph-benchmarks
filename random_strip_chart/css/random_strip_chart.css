@@ -1,0 +1,39 @@
+#Content
+{
+    position: absolute;
+}
+#Graph
+{
+    position: absolute;
+    left: 10px;
+    top: 10px;
+    width: 650px;
+    height: 300px;
+    border: 1px solid black;
+}
+#Graph2
+{
+    position: absolute;
+    left: 10px;
+    top: 310px;
+    width: 650px;
+    height: 300px;
+    border: 1px solid black;
+}
+#propertyeditor
+{
+    position: absolute;
+    left: 10px;
+    top: 700px;
+    width: 400px;
+    height: 300px;
+    border: double;
+}
+#StartButton
+{
+    position: absolute;
+    left: 100px;
+    top: 1050px;
+    width: 150px;
+    height: 25px;
+}

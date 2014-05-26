@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script type="text/javascript" src="../flot/jquery.js"></script>
+    <script type="text/javascript" src="../flot/jquery.ba-throttle-debounce.js"></script>
+    <script type="text/javascript" src="../flot/jquery.flot.js"></script>
+    <script type="text/javascript" src="../flot/jquery.flot.downsample.js"></script>
+    <script type="text/javascript" src="./jssource/setimmediate.js"></script>    
+    <script type="text/javascript" src="./jssource/flot_burn.js"></script>
+    <link rel="stylesheet" href="./css/random_strip_chart.css" type="text/css" />
+    <script type="text/javascript">
+      $(function () {
+        // initializing variables
+        Initialize();
+      });
+    </script>
+  </head>
+  <body>
+    <h1>Plotting 1 milion points graph as fast as possible</h1>
+    <div id="Content">
+      <div id="Graph"></div>
+      <P> </P>
+      <input id="StartButton1" type="button" value="Start"></input>
+      <P id="fps"></P>
+    </div>
+  </body>
+</html>

@@ -33,7 +33,7 @@ function Initialize() {
       canvas: true,
       series: {
         shadowSize: 0,	// Drawing is faster without shadows
-        downsample: { threshold: 2000 } // Default downsampling threshold 
+        downsample: { threshold: 2000 }
       },
       yaxis: {
         min: 0,
@@ -51,7 +51,8 @@ function Initialize() {
       [dps2], {
       lines: { show: true},
       yaxis: {
-        show: true
+        show: true,
+        min: 0
       },
       xaxis: {
         min: 1, max: 10,

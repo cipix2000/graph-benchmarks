@@ -24,6 +24,7 @@ function Initialize() {
   chart = $.plot("#Graph",
       [dps],{
       lines: { show: true, lineWidth: 1},
+      canvas: true,
       series: {
         shadowSize: 0,	// Drawing is faster without shadows
         downsample: { threshold: 2000 } // Default downsampling threshold 

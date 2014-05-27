@@ -1,7 +1,7 @@
 var chart;
 var actfps = 0;
 
-var datasize = 100001;
+var datasize = 1000001;
 
 var dps = [
   [1, 1],

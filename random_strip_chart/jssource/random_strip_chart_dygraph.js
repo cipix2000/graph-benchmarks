@@ -28,10 +28,11 @@ var dps2 = [
 var g, g2;
 function Initialize() {
     //$("#StartButton").jqxButton();
+    generateAllData();
     g = new Dygraph(
         document.getElementById("Graph"),
         dps,
-        {valueRange: [0, 10],
+        {valueRange: [-10, 10],
         drawPoints: false});
     
     g2 = new Dygraph(
@@ -40,16 +41,13 @@ function Initialize() {
     );
     
     $("#StartButton").on("click", function(){
+        dataIndex = 0;
         oneInterval(10);
     });
 }
 
-function updateChart() {
-    for (var i = 0; i < dataCounts[dataIndex]; i++) {
-        dps[i] = [i, Math.random() * 10.0];
-    }
-    
-    g.updateOptions( { 'file': dps } );
+function updateChart(data) {    
+    g.updateOptions( { 'file': data, valueRange: [-11 + Math.random(), 10 + Math.random()] } );
     frameCount++;
 }
 

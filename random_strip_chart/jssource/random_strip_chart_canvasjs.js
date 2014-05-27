@@ -25,7 +25,17 @@ var dps2 = [
            {x: 10, y: 1},
             ];
 
+function generateAllData() {
+  for (var j = 0 ; j < dataCounts.length; j++) {
+    allDPS[j] = [];
+    for (var i = 0; i < dataCounts[j]; i++) {
+      allDPS[j][i] = {x:i, y:Math.sin(i/dataCounts[j]*30) * 10.0};
+    }    
+  }
+};
+
 function Initialize() {
+    generateAllData();
     chart = new CanvasJS.Chart("Graph",
     {
       title:{
@@ -64,15 +74,16 @@ function Initialize() {
     chart2.render();
     
     $("#StartButton").on("click", function(){
+        dataIndex = 0;
         oneInterval(10);
     });
 }
 
-function updateChart() {
-    for (var i = 0; i < dataCounts[dataIndex]; i++) {
-        dps[i] = {x: i, y: Math.random() * 10.0};
-    }
-    
+function updateChart(data) {
+    chart.options.data[0].dataPoints = data;
+    chart.options.axisY.minimum = -11 + Math.random();
+    chart.options.axisY.maximum = 10 + Math.random();
+
     chart.render();
     frameCount++;
 }

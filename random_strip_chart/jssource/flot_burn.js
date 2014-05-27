@@ -1,7 +1,7 @@
 var chart;
 var actfps = 0;
 
-var datasize = 1000000;
+var datasize = 100001;
 
 var dps = [
   [1, 1],
@@ -45,7 +45,7 @@ function Initialize() {
 }
 
 function generateData() {
-  for (var i = 0; i < datasize*1.2; i++) {
+  for (var i = 0; i < datasize; i++) {
     dps[i] = [i, Math.sin(i/datasize*30) * 10.0];
   }
   for (var i = 0; i < datasize; i++) {
@@ -58,7 +58,7 @@ function burn() {
         frameCount = 0;
         actfps = 0;
         var imm = function(){
-            updateChart(datasize * 0.1 * Math.random());
+            updateChart(0);
             frameCount++;
             imediateRef = setImmediate(imm);
         }
@@ -92,6 +92,8 @@ function updateChart_throttled(count) {
 
 function updateChart_core(data) {
   var options = chart.getOptions();
+  options.yaxes[0].min = -11 + Math.random();
+  options.yaxes[0].max = 10 + Math.random();
   chart.setData([data]);
   chart.setupGrid();
   chart.draw();

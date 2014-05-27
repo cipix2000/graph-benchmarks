@@ -26,6 +26,7 @@ var dps2 = [
 ];
 
 function Initialize() {
+  generateAllData();
   chart = $.plot("#Graph",
       [dps],{
       lines: { show: true, lineWidth: 1},
@@ -59,18 +60,17 @@ function Initialize() {
     });
 
   $("#StartButton").on("click", function(){
+    dataIndex = 0;
     oneInterval(10);
   });
 }
 
-function updateChart() {
-  for (var i = 0; i < dataCounts[dataIndex]; i++) {
-    dps[i] = [i, Math.random() * 10.0];
-  }
-
+function updateChart(data) {
   var options = chart.getOptions();
   options.xaxes[0].max = dataCounts[dataIndex];
-  chart.setData([dps]);
+  options.yaxes[0].max = 10 + Math.random();
+  options.yaxes[0].min = -11 + Math.random();
+  chart.setData([data]);
   chart.setupGrid();
   chart.draw();
   frameCount++;

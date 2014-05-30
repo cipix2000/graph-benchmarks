@@ -1,0 +1,191 @@
+<html>
+<head>
+    <script type="text/javascript" src="flot/jquery.js"></script>
+    <script type="text/javascript" src="flot/jquery.flot.js"></script>
+    <script type="text/javascript" src="flot/jquery.flot.canvas.js"></script>
+    <script type="text/javascript" src="flot/jquery.flot.downsample.js"></script>
+    <script type="text/javascript" src="dygraph/dygraph-combined.js"></script>
+    <script type="text/javascript" src="canvasjs-1/canvasjs.min.js"></script>
+    <script type="text/javascript" src="benchmark_flot.js"></script>
+    <script type="text/javascript" src="benchmark_dygraphs.js"></script>
+    <script type="text/javascript" src="benchmark_canvasjs.js"></script>
+    <script src="lib/lodash.js"></script>
+	<script src="lib/benchmark.js"></script>
+    <link rel="stylesheet" href="random_strip_chart/css/random_strip_chart.css" type="text/css" />
+</head>
+<body> 
+<H2>Graph packages benchmark: 10 to 100000 points</H2>
+<div id="Graph" style="width:640px;height:480px;"></div>
+<P></P>
+<div id="Statusgraph" style="width:640px;height:350px;"></div>
+<P></P>
+<table id="Statustable" border="1px solid black" style=""></table>
+<P></P>
+<P id="status"></P>
+<div id="Report"></div>
+<script> 
+// code needed to show the result of the benchmarks.
+	var statusGraphData = [];
+	var ticks = [ ];
+	var yticks = [1, 5, 10, 30, 60, 120, 250, 500, 1000, 2000]; // TODO log tick generator
+
+	var statusGraph = $.plot('#Statusgraph', statusGraphData, 
+		{
+		xaxis: {
+	        show: true,
+	        ticks: ticks,
+	        transform: function (v) { return Math.log(v); },
+    		inverseTransform: function (v) { return Math.exp(v); },
+      	},
+      	yaxis: {
+      		    transform: function (v) { return Math.log(v); },
+    			inverseTransform: function (v) { return Math.exp(v); },
+    			min: 1,
+    			ticks: yticks
+      	},
+      	series: {
+			lines: {
+				show: true
+			},
+			points: {
+				show: true
+			}
+		},
+		grid: {
+			hoverable: true,
+			clickable: true
+		},
+		legend: {
+			position: 'sw'
+		}
+	});
+
+	$("<div id='tooltip'></div>").css({
+		position: "absolute",
+		display: "none",
+		border: "1px solid #fdd",
+		padding: "2px",
+		"background-color": "#fee",
+		opacity: 0.80
+	}).appendTo("body");
+
+	$("#Statusgraph").bind("plothover", function (event, pos, item) {
+		if (item) {
+			var x = item.datapoint[0].toFixed(2),
+				y = item.datapoint[1].toFixed(2);
+
+			$("#tooltip").html(item.series.label + " of " + x + " = " + y)
+				.css({top: item.pageY+5, left: item.pageX+5})
+				.fadeIn(200);
+		} else {
+			$("#tooltip").hide();
+		}
+	});
+
+	function updateTable() {
+		$('#Statustable').empty();
+		var content ='';
+		// table header
+		if (statusGraphData.length) {
+			content += '<tr><th></th`>';
+			statusGraphData[0].data.forEach(function (h) {
+				content += '<th>' + h[0].toFixed(0) + ' points</th>';
+			});
+			content += '</tr>';
+		}
+		statusGraphData.forEach( function (row) {
+			content += '<tr>';
+			content += '<td>' + row.label + '</td>';
+			row.data.forEach(function (cell) {
+				content += '<td>' + cell[1].toFixed(1) + ' fps </td>';
+			});
+			content += '</tr>';
+		});
+
+		content += '';
+		$('#Statustable').append(content);
+	}
+
+	function addPoint(label, x, y){
+		var tickfound = ticks.some(function(a) {return a===x});
+		if (!tickfound) ticks.push(x);
+
+		var serie = statusGraphData.filter(function (o) {return o.label===label;});
+		if (serie.length > 0) {
+			serie[0].data.push([x,y]);	
+		} else {
+			statusGraphData.push({label: label, data: [[x,y]]});
+		}		
+		var options = statusGraph.getOptions();
+    	options.xaxes[0].ticks = ticks;
+		statusGraph.setData(statusGraphData);
+    	statusGraph.setupGrid();
+    	statusGraph.draw();
+    	updateTable();
+	};
+
+	
+
+// benchmark
+	var dataCounts = [10, 50, 100, 500, 1000, 5000, 10000, 50000, 100000];
+	var flot = FlotBenchmark();
+	var dygraphs = DygraphsBenchmark();
+	var canvasjs = CanvasJSBenchmark();
+
+	var suite = new Benchmark.Suite;
+
+	dataCounts.forEach( function (count) {
+		suite
+		.add('canvas.js '+count,
+			function() {
+			  canvasjs.step();
+			},
+			{
+				onStart: function () {canvasjs.init('Graph', count);},
+				onComplete: function () {canvasjs.cleanup();}
+			}
+		)
+		.add('flot '+count,
+			function() {
+			  flot.step();
+			},
+			{
+				onStart: function () {flot.init('Graph', count);},
+				onComplete: function () {flot.cleanup();}
+			}
+		)
+		.add('flot.downsample '+count,
+			function() {
+			  flot.step();
+			},
+			{
+				onStart: function () {flot.init('Graph', count, true);},
+				onComplete: function () {flot.cleanup();}
+			}
+		)
+		.add('dygraphs '+count,
+			function() {
+			  dygraphs.step();
+			},
+			{
+				onStart: function () {dygraphs.init('Graph', count);},
+				onComplete: function () {dygraphs.cleanup();}
+			}
+		);
+	});
+
+	suite
+	// add listeners
+	.on('cycle', function(event) {
+	  var label = event.target.name.split(' ')[0];
+	  var number = parseInt(event.target.name.split(' ')[1]);
+	  addPoint(label, number, event.target.hz);
+	})
+	.on('complete', function() {
+	  $('#Graph').hide();
+	})
+	// run async
+	.run({ 'async': true });
+</script>
+</body>
+</html>

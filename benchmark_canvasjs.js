@@ -46,6 +46,7 @@ function CanvasJSBenchmark()
   function cleanup() {
     $(placehoder).empty();
     dps=[];
+    chart=null;
   }
 
   return {init: init, step: step, cleanup: cleanup};

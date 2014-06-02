@@ -1,7 +1,6 @@
 function DygraphsBenchmark()
 {
   'use strict';
-  var chart;
   var dps = [];
   var placehoder, g;
 
@@ -28,8 +27,10 @@ function DygraphsBenchmark()
   }
 
   function cleanup() {
+    g.destroy();
     $(placehoder).empty();
     dps=[];
+    g = null;
   }
 
   return {init: init, step: step, cleanup: cleanup};

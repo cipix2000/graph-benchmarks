@@ -45,8 +45,10 @@ function FlotBenchmark()
   }
 
   function cleanup() {
+    chart.shutdown();
     $(placehoder).empty();
     dps=[];
+    chart = null;
   }
 
   return {init: init, step: step, cleanup: cleanup};

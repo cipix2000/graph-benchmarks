@@ -4,17 +4,14 @@
     <script type="text/javascript" src="flot/jquery.flot.js"></script>
     <script type="text/javascript" src="flot/jquery.flot.canvas.js"></script>
     <script type="text/javascript" src="flot/jquery.flot.downsample.js"></script>
-    <script type="text/javascript" src="dygraph/dygraph-combined.js"></script>
-    <script type="text/javascript" src="canvasjs-1/canvasjs.min.js"></script>
-    <script type="text/javascript" src="benchmark_flot.js"></script>
-    <script type="text/javascript" src="benchmark_dygraphs.js"></script>
-    <script type="text/javascript" src="benchmark_canvasjs.js"></script>
+    <script type="text/javascript" src="flot/jquery.flot.orderBars.js"></script>
+    <script type="text/javascript" src="benchmark_million.js"></script>
     <script src="lib/lodash.js"></script>
 	<script src="lib/benchmark.js"></script>
     <link rel="stylesheet" href="random_strip_chart/css/random_strip_chart.css" type="text/css" />
 </head>
 <body> 
-<H2>Graph packages benchmark: 10 to 100000 points</H2>
+<h2>Graph packages benchmark: 1 million points</h2>
 <div id="Graph" style="width:640px;height:480px;"></div>
 <P></P>
 <div id="Statusgraph" style="width:640px;height:350px;"></div>
@@ -27,36 +24,26 @@
 // code needed to show the result of the benchmarks.
 	var statusGraphData = [];
 	var ticks = [ ];
-	var yticks = [1, 5, 10, 30, 60, 120, 250, 500, 1000, 2000]; // TODO log tick generator
+	var order = 1;
 
 	var statusGraph = $.plot('#Statusgraph', statusGraphData, 
 		{
-		xaxis: {
-	        show: true,
-	        ticks: ticks,
-	        transform: function (v) { return Math.log(v); },
-    		inverseTransform: function (v) { return Math.exp(v); },
-      	},
-      	yaxis: {
-      		    transform: function (v) { return Math.log(v); },
-    			inverseTransform: function (v) { return Math.exp(v); },
-    			min: 1,
-    			ticks: yticks
-      	},
+		xaxis: { min:900000, max: 1100000},
       	series: {
-			lines: {
-				show: true
-			},
-			points: {
-				show: true
-			}
+      		bars: { 
+      			show: true,
+      			barWidth: 50000,
+      			align: "center",
+      			order: 1
+      		}
 		},
+		canvas: false,
 		grid: {
 			hoverable: true,
 			clickable: true
 		},
 		legend: {
-			position: 'sw'
+			position: 'ne'
 		}
 	});
 
@@ -73,6 +60,14 @@
 		if (item) {
 			var x = item.datapoint[0].toFixed(2),
 				y = item.datapoint[1].toFixed(2);
+
+		//All the bars concerning a same x value must display a tooltip with this value and not the shifted value
+        if(item.series.bars.order){
+            for(var i=0; i < item.series.data.length; i++){
+                if(item.series.data[i][3] == item.datapoint[0])
+                    x = item.series.data[i][0].toFixed(2);
+            }
+        }
 
 			$("#tooltip").html(item.series.label + " of " + x + " = " + y)
 				.css({top: item.pageY+5, left: item.pageX+5})
@@ -114,7 +109,7 @@
 		if (serie.length > 0) {
 			serie[0].data.push([x,y]);	
 		} else {
-			statusGraphData.push({label: label, data: [[x,y]]});
+			statusGraphData.push({label: label, data: [[x,y]], bars: {order: order++}});
 		}		
 		var options = statusGraph.getOptions();
     	options.xaxes[0].ticks = ticks;
@@ -124,66 +119,40 @@
     	updateTable();
 	};
 
-	
-
 // benchmark
-	var dataCounts = [10, 50, 100, 500, 1000, 5000, 10000, 50000, 100000];
-	var flot = FlotBenchmark();
-	var dygraphs = DygraphsBenchmark();
-	var canvasjs = CanvasJSBenchmark();
+	var million = MillionPointsBenchmark();
 
 	var suite = new Benchmark.Suite;
 
-	dataCounts.forEach( function (count) {
-		suite
-		.add('canvas.js '+count,
-			function() {
-			  canvasjs.step();
-			},
-			{
-				onStart: function () {canvasjs.init('Graph', count);},
-				onComplete: function () {canvasjs.cleanup();}
-			}
-		)
-		.add('flot '+count,
-			function() {
-			  flot.step();
-			},
-			{
-				onStart: function () {flot.init('Graph', count);},
-				onComplete: function () {flot.cleanup();}
-			}
-		)
-		.add('flot.downsample '+count,
-			function() {
-			  flot.step();
-			},
-			{
-				onStart: function () {flot.init('Graph', count, true);},
-				onComplete: function () {flot.cleanup();}
-			}
-		)
-		.add('dygraphs '+count,
-			function() {
-			  dygraphs.step();
-			},
-			{
-				onStart: function () {dygraphs.init('Graph', count);},
-				onComplete: function () {dygraphs.cleanup();}
-			}
-		);
-	});
+	suite
+	.add('One Million Points',
+		function() {
+		  million.step();
+		},
+		{
+			onStart: function () {million.init('Graph', 1000000);},
+			onComplete: function () {million.cleanup();}
+		}
+	)
+	.add('One Million Points, Typed Arrays',
+		function() {
+		  million.step();
+		},
+		{
+			onStart: function () {million.init('Graph', 1000000, true);},
+			onComplete: function () {million.cleanup();}
+		}
+	)
+	;
 
 	suite
 	// add listeners
 	.on('cycle', function(event) {
 	  console.log('' + event.target.name + ' ' + event.target.hz);
-	  var label = event.target.name.split(' ')[0];
-	  var number = parseInt(event.target.name.split(' ')[1]);
-	  addPoint(label, number, event.target.hz);
+	  addPoint(event.target.name, 1000000, event.target.hz);
 	})
 	.on('complete', function() {
-	  $('#Graph').hide();
+	  //$('#Graph').hide();
 	})
 	// run async
 	.run({ 'async': true });

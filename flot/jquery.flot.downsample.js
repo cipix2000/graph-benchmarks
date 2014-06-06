@@ -98,9 +98,70 @@ THE SOFTWARE.
         return sampled;
     }
 
+    function maxMinInTheBuckets(data, threshold) {
+
+        var data_length = data.length;
+        if (threshold >= data_length || threshold === 0) {
+            return data; // Nothing to do
+        }
+
+        var sampled = [],
+            sampled_index = 0;
+
+        // Bucket size. Leave room for start and end data points
+        var every = (data_length - 2) / (threshold - 2);
+
+        var a = 0,  // Initially a is the first point in the triangle
+            max_area_point,
+            max_area,
+            area,
+            next_a;
+
+        sampled[ sampled_index++ ] = data[ a ]; // Always add the first point
+
+        for (var i = 0; i < threshold - 2; i++) {
+            // Calculate point average for next bucket (containing c)
+            var range_start  = floor( ( i ) * every ) + 1,
+                range_end    = floor( ( i + 1 ) * every ) + 1;
+
+            range_end = range_end < data_length ? range_end : data_length;
+
+            var max_index =  range_start , // * 1 enforces Number (value may be Date) , 
+                max_y = data[ range_start ][ 1 ] * 1,
+                min_index = range_start, // * 1 enforces Number (value may be Date) , 
+                min_y = data[ range_start ][ 1 ] * 1;
+
+
+            var range_length = range_end - range_start;
+
+            for ( ; range_start < range_end; range_start++ ) {
+              if (max_y < data[ range_start ][ 1 ] * 1) {
+                max_y = data[ range_start ][ 1 ] * 1;
+                max_index = range_start;
+              }
+
+              if (min_y > data[ range_start ][ 1 ] * 1) {
+                min_y = data[ range_start ][ 1 ] * 1;
+                min_index = range_start;
+              }
+            }
+
+            sampled[ sampled_index++ ] = data[max_index]; // Pick max point from the bucket
+            if (max_index !== min_index) {
+                sampled[ sampled_index++ ] = data[min_index];
+            }
+        }
+
+        sampled[ sampled_index++ ] = data[ data_length - 1 ]; // Always add last
+
+        return sampled;
+    }
+
+
 
     function processRawData ( plot, series ) {
-        series.data = largestTriangleThreeBuckets( series.data, series.downsample.threshold );
+        //series.data = largestTriangleThreeBuckets( series.data, series.downsample.threshold );
+        series.data = maxMinInTheBuckets( series.data, series.downsample.threshold );
     }
 
 

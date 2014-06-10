@@ -24,11 +24,24 @@ function MillionPointsBenchmark()
     }    
   };
 
-  function init(div, datasize, typedarrays) {
+  function generateWideData(datasize) {
+    dps = [[],[]];
+    for (var i = 0; i < datasize; i++) {
+      dps[0][i] = i;
+      dps[1][i] = Math.sin(i/datasize*30) * 10.0;
+    }    
+  };
+
+  function init(div, datasize, dataformat) {
     placehoder = '#' + div;
-    
-    if (typedarrays) generateTypedArrays(datasize);
-    else generateData(datasize);
+    var format = 'tall'
+
+    if (dataformat === 1) generateTypedArrays(datasize);
+    else if (dataformat === 0) generateData(datasize);
+    else if (dataformat === 2) {
+      generateWideData(datasize);
+      format = 'wide';
+    }
 
     chart = $.plot(placehoder,
         [dps],{
@@ -36,7 +49,7 @@ function MillionPointsBenchmark()
         canvas: true,
         series: {
           shadowSize: 0,	// Drawing is faster without shadows
-          downsample: { threshold: 2000 }
+          downsample: { threshold: 1000, dataformat: format }
         },
         yaxis: {
           min: 0,

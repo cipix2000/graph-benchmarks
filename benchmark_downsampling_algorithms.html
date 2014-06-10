@@ -5,15 +5,21 @@
     <script type="text/javascript" src="flot/jquery.flot.canvas.js"></script>
     <script type="text/javascript" src="flot/jquery.flot.downsample.js"></script>
     <script type="text/javascript" src="flot/jquery.flot.orderBars.js"></script>
-    <script type="text/javascript" src="benchmark_million.js"></script>
+    <script type="text/javascript" src="benchmark_downsampling_algorithms.js"></script>
     <script src="lib/lodash.js"></script>
 	<script src="lib/benchmark.js"></script>
     <link rel="stylesheet" href="random_strip_chart/css/random_strip_chart.css" type="text/css" />
 </head>
 <body> 
-<h2>Graph packages benchmark: 1 million points</h2>
-<div id="Graph" style="width:640px;height:480px;"></div>
-<P></P>
+<h2>Downsampling performance for 1 million points</h2>
+<P>Test the performance of the min/max in the bucket dowsampling algorithm with different data formats:
+	<UL>
+		<LI>JS arrays, tall format is a "2d native array" in the form [[x1, y1], [x2, y2], [x3, y3] ...]</LI>
+		<LI>JS arrays, wide format is a "2d native array" in the form [[x1, x2, x3, ...], [y1, y2, y3, ...]]</LI>
+		<LI>Typed arrays, tall format, is a 1D float64Array used as backing store and an array of 2 elements wide "views" into that array</LI>
+		<LI>Typed arrays, wide format, is a Javascript native array containing two Float64Arrays, something like [ Float64Array[x1, x2, x3, ...], Float64Array[y1, y2, y3, ...]]</LI>
+	</UL>
+</P>
 <div id="Statusgraph" style="width:640px;height:350px;"></div>
 <P></P>
 <table id="Statustable" border="1px solid black" cellspacing="0px"></table>
@@ -28,7 +34,7 @@
 
 	var statusGraph = $.plot('#Statusgraph', statusGraphData, 
 		{
-		xaxis: { min:900000, max: 1100000},
+		//xaxis: { min:900000, max: 1100000},
       	series: {
       		bars: { 
       			show: true,
@@ -120,36 +126,45 @@
 	};
 
 // benchmark
-	var million = MillionPointsBenchmark();
+	var down = Downsampling();
 
 	var suite = new Benchmark.Suite;
 
 	suite
-	.add('One Million Points, Wide Arrays',
+	.add('JS arrays, tall format',
 		function() {
-		  million.step();
+		  down.step();
 		},
 		{
-			onStart: function () {million.init('Graph', 1000000, 2);},
-			onComplete: function () {million.cleanup();}
+			onStart: function () {down.init(1000000, false, 1);},
+			onComplete: function () {down.cleanup();}
 		}
 	)
-	.add('One Million Points',
+	.add('JS arrays, wide format',
 		function() {
-		  million.step();
+		  down.step();
 		},
 		{
-			onStart: function () {million.init('Graph', 1000000, 0);},
-			onComplete: function () {million.cleanup();}
+			onStart: function () {down.init(1000000, false, 2);},
+			onComplete: function () {down.cleanup();}
 		}
 	)
-	.add('One Million Points, Typed Arrays',
+	.add('Typed arrays, tall format',
 		function() {
-		  million.step();
+		  down.step();
 		},
 		{
-			onStart: function () {million.init('Graph', 1000000, 1);},
-			onComplete: function () {million.cleanup();}
+			onStart: function () {down.init(1000000, true, 1);},
+			onComplete: function () {down.cleanup();}
+		}
+	)
+	.add('Typed arrays, wide format',
+		function() {
+		  down.step();
+		},
+		{
+			onStart: function () {down.init(1000000, true, 2);},
+			onComplete: function () {down.cleanup();}
 		}
 	)
 	;

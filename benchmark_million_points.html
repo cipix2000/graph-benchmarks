@@ -28,7 +28,6 @@
 
 	var statusGraph = $.plot('#Statusgraph', statusGraphData, 
 		{
-		xaxis: { min:900000, max: 1100000},
       	series: {
       		bars: { 
       			show: true,
@@ -134,7 +133,7 @@
 			onComplete: function () {million.cleanup();}
 		}
 	)
-	.add('One Million Points',
+	.add('One Million Points, Tall Arrays',
 		function() {
 		  million.step();
 		},

@@ -57,9 +57,16 @@ function Downsampling()
             }
           }
 
+
           sampled[ sampled_index++ ] = data[max_index]; // Pick max point from the bucket
-          if (max_index !== min_index) {
-              sampled[ sampled_index++ ] = data[min_index];
+          if (max_index <= min_index) {
+            sampled[ sampled_index++ ] = data[max_index]; // Pick max point from the bucket
+            sampled[ sampled_index++ ] = data[min_index];
+          } else if (max_index >= min_index) {
+            sampled[ sampled_index++ ] = data[min_index];
+            sampled[ sampled_index++ ] = data[max_index]; // Pick max point from the bucket
+          } else {
+            sampled[ sampled_index++ ] = data[min_index];
           }
       }
 
@@ -115,9 +122,14 @@ function maxMinInTheBuckets2(data, threshold) {
             }
           }
 
-          sampled[ sampled_index++ ] = [data[0][max_index], data[1][max_index]]; // Pick max point from the bucket
-          if (max_index !== min_index) {
-              sampled[ sampled_index++ ] = [data[0][min_index], data[1][min_index]];
+          if (max_index <= min_index) {
+            sampled[ sampled_index++ ] = [data[0][max_index], data[1][max_index]]; // Pick max point from the bucket
+            sampled[ sampled_index++ ] = [data[0][min_index], data[1][min_index]];
+          } else if (max_index <= min_index) {
+            sampled[ sampled_index++ ] = [data[0][min_index], data[1][min_index]];
+            sampled[ sampled_index++ ] = [data[0][max_index], data[1][max_index]]; // Pick max point from the bucket
+          } else {
+            sampled[ sampled_index++ ] = [data[0][min_index], data[1][min_index]]; // Pick max point from the bucket
           }
       }
 

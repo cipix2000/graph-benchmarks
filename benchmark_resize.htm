@@ -5,14 +5,17 @@
     <script type="text/javascript" src="flot/jquery.flot.canvas.js"></script>
     <script type="text/javascript" src="flot/jquery.flot.downsample.js"></script>
     <script type="text/javascript" src="flot/jquery.flot.orderBars.js"></script>
-    <script type="text/javascript" src="benchmark_million.js"></script>
+    <script type="text/javascript" src="benchmark_resize.js"></script>
     <script src="lib/lodash.js"></script>
 	<script src="lib/benchmark.js"></script>
+	<script src="lib/setimmediate.js"></script>
     <link rel="stylesheet" href="random_strip_chart/css/random_strip_chart.css" type="text/css" />
 </head>
 <body> 
-<h2>Graph packages benchmark: 1 million points</h2>
-<div id="Graph" style="width:640px;height:480px;"></div>
+<h2>Graph packages benchmark: resize</h2>
+<div id = "GraphHolder" style="width:1000px;height:700px;">
+	<div id="Graph" style="width:640px;height:480px;"></div>
+</div>
 <P></P>
 <div id="Statusgraph" style="width:640px;height:350px;"></div>
 <P></P>
@@ -25,6 +28,7 @@
 	var statusGraphData = [];
 	var ticks = [ ];
 	var order = 1;
+	var step = 0;
 
 	var statusGraph = $.plot('#Statusgraph', statusGraphData, 
 		{
@@ -76,7 +80,7 @@
 		}
 	});
 
-	function updateTable() {
+	function updateTable() { 
 		$('#Statustable').empty();
 		var content ='';
 		// table header
@@ -119,45 +123,28 @@
 	};
 
 // benchmark
-	var million = MillionPointsBenchmark();
+	var million = ResizeBenchmark();
 
 	var suite = new Benchmark.Suite;
 
 	suite
-	.add('One Million Points, Wide Arrays',
-		function() {
-		  million.step();
-		},
+	.add('1000 Points, resize',
 		{
-			onStart: function () {million.init('Graph', 1000000, 2);},
+			defer: true,
+	    	fn: function(d) {
+				setImmediate(function() {d.resolve();});
+				million.step();
+			},
+			onStart: function () {million.init('Graph', 100, 2);},
 			onComplete: function () {million.cleanup();}
 		}
-	)
-	.add('One Million Points, Tall Arrays',
-		function() {
-		  million.step();
-		},
-		{
-			onStart: function () {million.init('Graph', 1000000, 0);},
-			onComplete: function () {million.cleanup();}
-		}
-	)
-	.add('One Million Points, Typed Arrays',
-		function() {
-		  million.step();
-		},
-		{
-			onStart: function () {million.init('Graph', 1000000, 1);},
-			onComplete: function () {million.cleanup();}
-		}
-	)
-	;
+	);
 
 	suite
 	// add listeners
 	.on('cycle', function(event) {
 	  console.log('' + event.target.name + ' ' + event.target.hz);
-	  addPoint(event.target.name, 1000000, event.target.hz);
+	  addPoint(event.target.name, 1000, event.target.hz);
 	})
 	.on('complete', function() {
 	  //$('#Graph').hide();

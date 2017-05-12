@@ -8,8 +8,8 @@ function CanvasJSBenchmark()
   function generateData(datasize) {
     dps = [];
     for (var i = 0; i < datasize; i++) {
-      dps[i] = {x:i, y:Math.sin(i/datasize*30) * 10.0};
-    }    
+      dps[i] = {y:Math.sin(i/datasize*30) * 10.0};
+    }
   };
 
   function init(div, datasize) {
@@ -20,19 +20,19 @@ function CanvasJSBenchmark()
     {
       axisY:{
         minimum: -10,
-        maximum: 10      
+        maximum: 10
       },
       animationEnabled: false,
       interactivityEnabled: false,
       data: [
-        {        
+        {
           type: "line",
           lineThickness: 1,
           dataPoints: dps
         }
       ]
     });
-    
+
     chart.render();
   }
 

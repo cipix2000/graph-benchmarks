@@ -1,0 +1,12 @@
+
+{
+  "name": "graph-benchmarks",
+  "version": "0.0.0",
+  "description": "performance, webcharts, graph, chart, intensity",
+  "author": "National Instruments Corporation",
+  "license": "https://www.ni.com/legal/license/",
+  "homepage": "https://github.com/ni-kismet/",
+  "dependencies": {
+    "ni-webcharts": "0.4.13"
+  }
+}

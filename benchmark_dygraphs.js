@@ -8,7 +8,7 @@ function DygraphsBenchmark()
     dps = [];
     for (var i = 0; i < datasize; i++) {
       dps[i] = [i, Math.sin(i/datasize*30) * 10.0];
-    }    
+    }
   };
 
   function init(div, datasize) {
@@ -19,7 +19,8 @@ function DygraphsBenchmark()
         document.getElementById(div),
         dps,
         {valueRange: [-10, 10],
-        drawPoints: false});
+        drawPoints: false,
+        strokeWidth: 1});
   }
 
   function step() {

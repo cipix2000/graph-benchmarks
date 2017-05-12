@@ -1,22 +1,67 @@
 <html>
 <head>
+    <script>
+    window.i18nPath = window.i18nPath || '../'; //relative to the user_app.html file
+    window.i18nFiles = window.i18nFiles || [];
+    window.i18nFiles.push('node_modules/ni-webcharts/messages/Webcharts');
+    </script>
+
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script type="text/javascript" src="flot/jquery.js"></script>
-    <script type="text/javascript" src="flot/jquery.flot.js"></script>
-    <script type="text/javascript" src="flot/jquery.flot.canvas.js"></script>
-    <script type="text/javascript" src="flot/jquery.flot.downsample.js"></script>
-    <script type="text/javascript" src="dygraph/dygraph-combined.js"></script>
-    <script type="text/javascript" src="canvasjs-1/canvasjs.min.js"></script>
+    <script  type="text/javascript" src="node_modules/jquery/dist/jquery.min.js"></script>
+    <script  type="text/javascript" src="node_modules/engineering-flot/dist/jquery.flot.js"></script>
+    <script  type="text/javascript" src="node_modules/engineering-flot/jquery.flot.navigate.js"></script>
+    <script  type="text/javascript" src="node_modules/engineering-flot/jquery.flot.flatdata.js"></script>
+    <script  type="text/javascript" src="node_modules/engineering-flot/jquery.flot.logaxis.js"></script>
+    <script  type="text/javascript" src="node_modules/engineering-flot/jquery.flot.axislabels.js"></script>
+    <script  type="text/javascript" src="node_modules/flot-cursors-plugin/jquery.flot.cursors.js"></script>
+    <script  type="text/javascript" src="node_modules/engineering-flot/jquery.flot.time.js"></script>
+    <script  type="text/javascript" src="node_modules/engineering-flot/jquery.flot.symbol.js"></script>
+    <script  type="text/javascript" src="node_modules/flot-charting/lib/cbuffer.js"></script>
+    <script  type="text/javascript" src="node_modules/flot-charting/jquery.flot.segment-tree.js"></script>
+    <script  type="text/javascript" src="node_modules/flot-charting/jquery.flot.historybuffer.js"></script>
+    <script  type="text/javascript" src="node_modules/flot-charting/jquery.flot.charting.js"></script>
+    <script  type="text/javascript" src="node_modules/flot-intensitygraph-plugin/jquery.flot.intensitygraph.js"></script>
+
+    <script  type="text/javascript" src="node_modules/ni-data-types/sources/niComplex.js"></script>
+    <script  type="text/javascript" src="node_modules/ni-data-types/sources/niTimeStamp.js"></script>
+    <script  type="text/javascript" src="node_modules/ni-data-types/sources/niAnalogWaveform.js"></script>
+    <script  type="text/javascript" src="node_modules/ni-data-types/sources/niNumericFormatters.js"></script>
+    <script ="text/javascript" src="node_modules/webcomponents-lite/webcomponents-lite.js"></script>
+
+    <script defer type="text/javascript" src="node_modules/ni-webcharts/dist/element.min.js"></script>
+    <script defer type="text/javascript" src="node_modules/ni-webcharts/dist/webcharts.min.js"></script>
+    <script defer type="text/javascript" src="node_modules/ni-webcharts/dist/element_registration.min.js"></script>
+
     <script type="text/javascript" src="benchmark_googlechart.js"></script>
-    <script type="text/javascript" src="benchmark_flot.js"></script>
+    <script type="text/javascript" src="dygraph/dygraph.js"></script>
+    <script type="text/javascript" src="canvasjs-1/canvasjs.min.js"></script>
     <script type="text/javascript" src="benchmark_dygraphs.js"></script>
+    <script type="text/javascript" src="benchmark_webcharts.js"></script>
     <script type="text/javascript" src="benchmark_canvasjs.js"></script>
     <script src="lib/lodash.js"></script>
 	<script src="lib/benchmark.js"></script>
     <link rel="stylesheet" href="random_strip_chart/css/random_strip_chart.css" type="text/css" />
+    <link rel="stylesheet" href="node_modules/ni-webcharts/styles/webchartsLight.css" />
+    <style>
+        ni-cartesian-graph {
+            display: inline-block;
+            width:100%;
+            height: 100%;
+            min-height: 50px;
+        }
+
+        ni-cartesian-graph text {
+            stroke: none;
+            stroke-width: 1px;
+            font-size: 12px;
+            font-family: sans-serif;
+            fill: #222266;
+        }
+
+    </style>
 </head>
 <body>
-<H2>Graph packages benchmark: 10 to 100000 points</H2>
+<H2>Graph packages benchmark: 1000 to 250000 points</H2>
 <div id="Graph" style="width:640px;height:480px;"></div>
 <P></P>
 <div id="Statusgraph" style="width:640px;height:350px;"></div>
@@ -29,21 +74,24 @@
 // code needed to show the result of the benchmarks.
 	var statusGraphData = [];
 	var ticks = [ ];
-	var yticks = [1, 5, 10, 30, 60, 120, 250, 500, 1000, 2000]; // TODO log tick generator
+	var xticks = [[1000, '1000'], [10000, '10000'], [100000, '10000'], [1000000, '1000000']]; // TODO log tick generator
 
 	var statusGraph = $.plot('#Statusgraph', statusGraphData,
 		{
 		xaxis: {
 	        show: true,
-	        ticks: ticks,
-	        transform: function (v) { return Math.log(v); },
-    		inverseTransform: function (v) { return Math.exp(v); },
+            mode: 'log',
+            autoscale: 'none',
+            ticks: xticks,
+            min: 1000,
+            max: 1000000
       	},
       	yaxis: {
-      		    transform: function (v) { return Math.log(v); },
-    			inverseTransform: function (v) { return Math.exp(v); },
-    			min: 1,
-    			ticks: yticks
+            show: true,
+            mode: 'log',
+            autoscale: 'exact',
+            min: 1,
+            max: 1000
       	},
       	series: {
 			lines: {
@@ -126,14 +174,16 @@
     	updateTable();
 	};
 
+<<<<<<< ab5003060ff92abaead7f3a2322e5d267783b381
 
 
 // benchmark
-	var dataCounts = [10, 50, 100, 500, 1000, 5000, 10000, 50000, 100000];
+	var dataCounts = [1000, 10000, 100000, 1000000];
+	//var flot = FlotBenchmark();
     var googlechart = GoogleChartBenchmark();
-	var flot = FlotBenchmark();
 	var dygraphs = DygraphsBenchmark();
 	var canvasjs = CanvasJSBenchmark();
+    var webcharts = WebchartsBenchmark();
 
 	var suite = new Benchmark.Suite;
 
@@ -148,6 +198,15 @@
 				onComplete: function () {googlechart.cleanup();}
 			}
 		)
+        .add('webcharts '+count,
+            function() {
+                webcharts.step();
+            },
+            {
+                onStart: function () {webcharts.init('Graph', count);},
+                onComplete: function () {webcharts.cleanup();}
+            }
+        )
 		.add('canvas.js '+count,
 			function() {
 			  canvasjs.step();
@@ -155,24 +214,6 @@
 			{
 				onStart: function () {canvasjs.init('Graph', count);},
 				onComplete: function () {canvasjs.cleanup();}
-			}
-		)
-		.add('flot '+count,
-			function() {
-			  flot.step();
-			},
-			{
-				onStart: function () {flot.init('Graph', count);},
-				onComplete: function () {flot.cleanup();}
-			}
-		)
-		.add('flot.downsample '+count,
-			function() {
-			  flot.step();
-			},
-			{
-				onStart: function () {flot.init('Graph', count, true);},
-				onComplete: function () {flot.cleanup();}
 			}
 		)
 		.add('dygraphs '+count,
@@ -185,7 +226,6 @@
 			}
 		);
 	});
-
 
     function run() {
     	suite

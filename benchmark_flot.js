@@ -9,7 +9,7 @@ function FlotBenchmark()
     dps = [];
     for (var i = 0; i < datasize; i++) {
       dps[i] = [i, Math.sin(i/datasize*30) * 10.0];
-    }    
+    }
   };
 
   function init(div, datasize, downsample) {
@@ -25,20 +25,19 @@ function FlotBenchmark()
         },
         yaxis: {
           min: 0,
-          max: 10
+          max: 10,
+          autoscale: 'exact'
         },
         xaxis: {
           min:0, max: datasize, show: true
         }
       });
     var options = chart.getOptions();
-    if (!downsample) options.series.downsample.threshold = 0;
   }
 
   function step() {
-    var options = chart.getOptions();
-    options.yaxes[0].max = 10 + Math.random();
-    options.yaxes[0].min = -11 + Math.random();
+    dps[0][1] = -11 + Math.random();
+    dps[1][1] = 11 + Math.random();
     chart.setData([dps]);
     chart.setupGrid();
     chart.draw();

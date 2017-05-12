@@ -26,11 +26,11 @@
     <script  type="text/javascript" src="node_modules/ni-data-types/sources/niTimeStamp.js"></script>
     <script  type="text/javascript" src="node_modules/ni-data-types/sources/niAnalogWaveform.js"></script>
     <script  type="text/javascript" src="node_modules/ni-data-types/sources/niNumericFormatters.js"></script>
-    <script ="text/javascript" src="node_modules/webcomponents-lite/webcomponents-lite.js"></script>
+    <script  type="text/javascript" src="node_modules/webcomponents-lite/webcomponents-lite.js"></script>
 
-    <script defer type="text/javascript" src="node_modules/ni-webcharts/dist/element.min.js"></script>
-    <script defer type="text/javascript" src="node_modules/ni-webcharts/dist/webcharts.min.js"></script>
-    <script defer type="text/javascript" src="node_modules/ni-webcharts/dist/element_registration.min.js"></script>
+    <script  type="text/javascript" src="node_modules/ni-webcharts/dist/element.min.js"></script>
+    <script  type="text/javascript" src="node_modules/ni-webcharts/dist/webcharts.min.js"></script>
+    <script  type="text/javascript" src="node_modules/ni-webcharts/dist/element_registration.min.js"></script>
 
     <script type="text/javascript" src="benchmark_googlechart.js"></script>
     <script type="text/javascript" src="dygraph/dygraph.js"></script>
@@ -38,6 +38,7 @@
     <script type="text/javascript" src="benchmark_dygraphs.js"></script>
     <script type="text/javascript" src="benchmark_webcharts.js"></script>
     <script type="text/javascript" src="benchmark_canvasjs.js"></script>
+    <script type="text/javascript" src="benchmark_flot.js"></script>
     <script src="lib/lodash.js"></script>
 	<script src="lib/benchmark.js"></script>
     <link rel="stylesheet" href="random_strip_chart/css/random_strip_chart.css" type="text/css" />
@@ -175,7 +176,7 @@
 
 // benchmark
 	var dataCounts = [1000, 10000, 100000, 1000000];
-	//var flot = FlotBenchmark();
+	var flot = FlotBenchmark();
     var googlechart = GoogleChartBenchmark();
 	var dygraphs = DygraphsBenchmark();
 	var canvasjs = CanvasJSBenchmark();
@@ -196,6 +197,7 @@
 			}
 		)
         */
+
         .add('webcharts '+count,
             function() {
                 webcharts.step();
@@ -203,6 +205,15 @@
             {
                 onStart: function () {webcharts.init('Graph', count);},
                 onComplete: function () {webcharts.cleanup();}
+            }
+        )
+        .add('flot '+count,
+            function() {
+                flot.step();
+            },
+            {
+                onStart: function () {flot.init('Graph', count);},
+                onComplete: function () {flot.cleanup();}
             }
         )
 		.add('canvas.js '+count,

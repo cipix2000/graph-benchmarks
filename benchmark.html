@@ -61,15 +61,13 @@
     </style>
 </head>
 <body>
-<H2>Graph packages benchmark: 1000 to 250000 points</H2>
-<div id="Graph" style="width:640px;height:480px;"></div>
+<H2>Graph packages benchmark: 1000 to 1000000 points</H2>
 <P></P>
 <div id="Statusgraph" style="width:640px;height:350px;"></div>
 <P></P>
 <table id="Statustable" border="1px solid black" cellspacing="0px"></table>
 <P></P>
-<P id="status"></P>
-<div id="Report"></div>
+<div id="Graph" style="width:640px;height:480px;"></div>
 <script>
 // code needed to show the result of the benchmarks.
 	var statusGraphData = [];
@@ -174,8 +172,6 @@
     	updateTable();
 	};
 
-<<<<<<< ab5003060ff92abaead7f3a2322e5d267783b381
-
 
 // benchmark
 	var dataCounts = [1000, 10000, 100000, 1000000];
@@ -189,6 +185,7 @@
 
 	dataCounts.forEach( function (count) {
 		suite
+        /*
         .add('googlechart '+count,
 			function() {
 			  googlechart.step();
@@ -198,6 +195,7 @@
 				onComplete: function () {googlechart.cleanup();}
 			}
 		)
+        */
         .add('webcharts '+count,
             function() {
                 webcharts.step();

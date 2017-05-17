@@ -1,0 +1,41 @@
+/**************************************
+* Webcharts Control Styles
+* National Instruments Copyright 2017
+*
+**************************************/
+
+ni-cartesian-graph,
+ni-chart,
+ni-intensity-graph {
+    border: 1px solid #575C60;
+    padding: 20px;
+    display: inline-block;
+    min-height: 20px;
+    color: #b0b0b8;
+    box-sizing: border-box;
+}
+
+ni-cartesian-graph ni-grid-div,
+ni-chart ni-grid-div,
+ni-intensity-graph ni-grid-div {
+    border-style: none;
+    border-width: 0px 0px 0px 0px;
+    border-color: white;
+    background-color: inherit;
+    color: inherit;
+}
+
+ni-cartesian-axis {
+    font-family: "Open Sans", verdana, arial, sans-serif;
+    /*font-family: 'Droid Sans Mono', monospace;*/
+    font-size: 12px;
+    font-style: normal;
+    color: #575C60;
+}
+
+ni-cartesian-graph .axisLabels,
+ni-chart .axisLabels,
+ni-intensity-graph .axisLabels {
+    font-family: "Open Sans", verdana, arial, sans-serif;
+    font-size: 12px;
+}

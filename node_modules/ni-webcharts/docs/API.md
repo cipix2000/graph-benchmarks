@@ -1,0 +1,667 @@
+# Webcharts Reference
+
+> Web components for plotting engineering and scientific data with a focus on performance.
+
+**Table of Contents**
+
+[Introduction](#introduction)
+| [Using webcharts](#using-webcharts)
+| [Styling webcharts](#styling-webcharts)
+| [Graph](#ni-cartesian-graph)
+| [Chart](#ni-chart)
+| [Intensity Graph](#ni-intensity-graph)
+| [Cartesian Axes](#ni-cartesian-axis)
+| [Color Scale](#ni-color-scale)
+| [Plots](#ni-cartesian-plot)
+| [Plot renderer](#ni-cartesian-plot-renderer)
+| [Cursors](#ni-cursor)
+
+## Introduction ##
+
+Webcharts is a collection of [web components](https://www.webcomponents.org/introduction)
+for plotting engineering and scientific data, with a focus on performance.
+
+## Using webcharts ##
+
+Webcharts is distributed through npm with the package name **ni-webcharts**.
+
+Add webcharts to your app:
+
+    npm install --save ni-webcharts
+
+Add webcharts to a webpage:
+
+```html
+<link rel="stylesheet" href="node_modules/ni-webcharts/styles/webchartsLight.css" />
+<link rel="import" href="node_modules/ni-webcharts/dist/webcharts.min.html"/>
+<script type="text/javascript" src="node_modules/webcomponents-lite/webcomponents-lite.js"></script>
+```
+
+## Styling webcharts ##
+
+The way Webcharts look is configured using a mix of elements properties, described
+below in this document, and CSS styles. A guide for styling with CSS is [here](styling.md).
+
+
+
+## ni-cartesian-graph
+
+> A custom element that allows to graph one or multiple data sets.
+
+An ni-cartesian-graph is a declarative way, that uses custom elements, to add a graph
+to a web page. Specify your data sets using the value attribute and customize how
+the data is renderended using nested custom elements such as *ni-cartesian-axis*,
+*ni-cartesian-plot*, *ni-cartesian-plot-renderer* or *ni-cursor*.
+
+Example showing how you can render a graph of prime number versus fibonacci numbers.
+```html
+<ni-cartesian-graph value="[[2, 3, 5, 7, 11, 13, 17, 19],
+                          [0, 1, 1, 2, 3, 5, 8, 13]]">
+  <ni-cartesian-axis show label="Index" axis-position="bottom"></ni-cartesian-axis>
+  <ni-cartesian-axis show label="Value" axis-position="left"></ni-cartesian-axis>
+  <ni-cartesian-plot show label="Prime Numbers">
+    <ni-cartesian-plot-renderer line-width="2" line-stroke="red">
+    </ni-cartesian-plot-renderer>
+  </ni-cartesian-plot>
+  <ni-cartesian-plot show label="Fibonacci Numbers">
+    <ni-cartesian-plot-renderer line-width="2" line-stroke="blue">
+    </ni-cartesian-plot-renderer>
+  </ni-cartesian-plot>
+</ni-cartesian-graph>
+```
+
+
+### ni-cartesian-graph properties
+
+**graph-ref** - a graph id used to bind legends to the graph
+
+**plot-area-margin** - TODO - document this
+
+
+### ni-cartesian-graph methods
+
+**setData** is the prefered method to write data to a graph. The other
+option, writing to the *value* property of the element is only recomended
+for rarely changed small datasets, since it consumes more memory and CPU
+due to the serialization/deserialization needed.
+
+```js
+// graph needs to be ready before calling any methods on it
+var graph = document.querySelector('#myGraph');
+graph.setData([1, 2, 3, 4, 5]);
+```
+
+
+## Data types supported by the ni-cartesian-graph
+
+Data can be passed to a graph either through writing to the element value
+property or using API access (the setData() method on the element).
+
+Here is a list of supported data types:
+
+
+* **A 1D array of numerics**
+```js
+[a1, a2, a3]
+```
+Will be drawn as a single plot. It's an efficient and fast way to
+pass data to the graph.
+
+A typed array view is also allowed.
+
+
+* **A 2D array of numerics**
+```js
+[[a1, a2, a3], [b1, b2, b3]]
+```
+Will be drawn as multiple plots. It's an efficient and fast way to
+pass data to the graph.
+
+An array of typed array views is also allowed.
+
+
+* **An analogWaveform**
+```js
+var data = new NIAnalogWaveform({
+    t0: new NITimestamp(),
+    dt: 0.001, // 1 ms
+    Y: [a1, a2, a3]
+});
+```
+Will be drawn as a single plot. It's an
+efficient and fast way to pass data to the graph
+
+
+* **An array of analogWaveforms**
+```js
+var aw0 = new NIAnalogWaveform({
+    t0: new NITimestamp(),
+    dt: 0.001, // 1 ms
+    Y: [a1, a2, a3]
+});
+var aw1 = new NIAnalogWaveform({
+    t0: new NITimestamp(),
+    dt: 0.001, // 1 ms
+    Y: [b1, b2, b3]
+});
+var data = [aw0, aw1];
+```
+Will be drawn as multiple plots. It's an efficient and fast way to
+pass data to the graph.
+
+
+* **An object (cluster) of arrays**
+```js
+var data = {a: [a1, a2, a3], b: [b1, b2, b3]};
+```
+ Will be drawn as a single XY plot,
+the first array will hold the X coordinates and the second the Y
+coordinates. This format is only recomended when you want to display
+XY data, it's not particulary efficient or fast.
+
+
+* **An array of objects (clusters) of arrays**
+```js
+var data = [
+    {a: [a1, a2, a3], b: [b1, b2, b3]},
+    {c: [c1, c2, c3], d: [d1, d2, d3]}
+];
+```
+Will be drawn as multiple XY plots, the first array in the object
+(cluster) will hold the X coordinates and the second the Y coordinates.
+This format is only recomended when you want to display XY data,
+it's not particulary efficient or fast.
+
+
+* **An array of objects (clusters)**
+```js
+var data = [
+    {x: a1, y: b1},
+    {x: a2, y: b2},
+    {x: a3, y: b3},
+];
+```
+Will be drawn as a single XY plot, the first element in the cluster
+will hold the X coordinates and the second the Y coordinates. This
+format is only recomended when you want to display XY data, it's not
+particulary efficient or fast.
+
+
+* **An array of array of objects (clusters)**
+```js
+var data = [
+    [{x: a1, y: b1}, {x: a2, y: b2}, {x: a3, y: b3}],
+    [{x: c1, y: d1}, {x: c2, y: d2}, {x: c3, y: d3}]
+];
+```
+Will be drawn as multiple XY plots, the first element in the cluster
+will hold the X coordinates and the second the Y coordinates. This
+format is only recomended when you want to display XY data, it's not
+particulary efficient or fast.
+
+
+* **An 1D array of Complex Numbers**
+```js
+var a1 = new NIComplex(1, 2);
+var a2 = new NIComplex(2, 3);
+var a3 = new NIComplex(3, 4);
+var data = [a1, a2, a3]; // array of complex numbers
+var data2 = ['1+2i', '2+3i', '3+4i']; // also accepted as input
+```
+Will be drawn as a single plot.
+
+
+* **A 2D array of Complex Numbers**
+```js
+var a1 = new NIComplex(1, 2);
+var a2 = new NIComplex(2, 3);
+var b1 = new NIComplex(3, 4);
+var b2 = new NIComplex(4, 5);
+var data = [[a1, a2], [b1, b2]]; // arrays of complex numbers
+var data2 = [['1+2i', '2+3i'], ['3+4i', '4+5i']]; // also accepted as input
+```
+Will be drawn as multiple plots.
+
+
+
+
+## ni-chart
+
+> A custom element that allows to chart one or multiple data sets.
+
+The difference between a graph and a chart is that a graph plots directly the data
+sets provided but the chart uses a buffer of historical values, called a
+HistoryBuffer for data handling.
+
+As you append new values to the charts' History buffer the chart is updated as
+needed, on the next browser animation frame.
+
+Example:
+
+```html
+<ni-chart id="chart1" bufferSize="1024">
+    <ni-cartesian-axis show label="Time" axis-position="bottom"></ni-cartesian-axis>
+    <ni-cartesian-axis show label="Amplitude" axis-position="left"></ni-cartesian-axis>
+    <ni-cartesian-plot show label="Plot 1">
+      <ni-cartesian-plot-renderer line-width="2" line-stroke="#a84716"></ni-cartesian-plot-renderer>
+    </ni-cartesian-plot>
+</ni-chart>
+
+<script>
+  var historyBuffer = $('#chart1').getHistoryBuffer();
+
+  // write 1000 values into the chart's history buffer
+  for (var i = 0; i < 10; i++) {
+    historyBuffer.push(Math.sin(i));
+    i += 0.01;
+  }
+</script>
+```
+
+The HistoryBuffer API is described [here](historyBuffer.md).
+
+## Data types supported by ni-chart
+
+To add data to the chart you need to write it into the history buffer. Here are
+examples for adding numbers and arrays of numbers to the history buffer.
+
+* **Numbers**
+```js
+    var chart = document.querySelector('#myChart');
+    var hb = chart.getHistoryBuffer();
+
+    hb.push(5); // add 5 to the history buffer
+```
+This will render a single plot
+
+* **multiple Numbers**
+```js
+    var chart = document.querySelector('#myChart');
+    var hb = chart.getHistoryBuffer();
+
+    hb.push([5, 7, 8]); // adds 5 to first data series,
+                        // 7 to the second one and 8 to the third one
+```
+This will render 3 plots
+
+* **array of Numbers**
+```js
+    var chart = document.querySelector('#myChart');
+    var hb = chart.getHistoryBuffer();
+
+    hb.appendArray([5, 7, 8]); // add 5, 7 and 8 to first data series
+```
+This will render a single plot.
+
+* **arrays of arrays of Numbers**
+```js
+    var chart = document.querySelector('#myChart');
+    var hb = chart.getHistoryBuffer();
+
+    hb.appendArray([[5, 7], [8, 9]]); // add 5 and 7 to first data series
+                                     // and 8 and 9 to the second one
+```
+This will render two plots.
+
+
+When writing values to multiple plots make sure the history buffer is the same
+size as the number of data series you write to. Use [history buffer's](historyBuffer.md) *setWidth*
+method to change the number of data series in the chart.
+
+
+### ni-chart properties
+
+**buffer-size** (number) - the size of the chart history buffer 
+
+### ni-chart methods
+
+**setHistoryBuffer(historyBuffer)** - changes the internal history buffer
+   of the chart to the provided one
+
+**getHistoryBuffer()** - returns a reference to the internal history
+   buffer of the chart
+
+
+## ni-intensity-graph
+
+> A custom element that allows to plot a 2D data set as a gradient map.
+
+An ni-intensity-graph is a declarative way, that uses custom elements, to add an
+intensity graph to a web page. Specify your data sets using the value attribute
+and customize how the data is renderended using nested custom elements such as
+*ni-cartesian-axis*, *ni-color-scale*.
+
+Example:
+```html
+<ni-intensity-graph id="graph1" value="[[0.1, 0.2], [0.3, 0.4], [0.5, 0.6]]">
+    <ni-cartesian-axis label="X" show show-label axis-position="bottom" grid-lines></ni-cartesian-axis>
+    <ni-cartesian-axis label="Y" show show-label axis-position="left" grid-lines></ni-cartesian-axis>
+    <ni-color-scale label="Color Scale" show show-label
+        markers='[{"value":0,"color":"rgba(0,0,0,1)"},{"value":50,"color":"rgba(0,0,255,1)"},{"value":100,"color":"rgba(255,255,255,1)"}]'
+        high-color="rgba(255,255,255,1)" low-color="rgba(0,0,0,1)">
+    </ni-color-scale>
+</ni-intensity-graph>
+```
+
+
+
+## ni-cartesian-axis
+
+> Add axes to a graph.
+
+```html
+<ni-cartesian-graph>
+  <ni-cartesian-axis show grid-lines show-label label="Axis 1" axis-position='bottom'>
+  </ni-cartesian-axis>
+  <ni-cartesian-axis show grid-lines show-label label="Axis 2" axis-position='top'>
+  </ni-cartesian-axis>
+  <ni-cartesian-axis show grid-lines show-label label="Axis 3" axis-position='left'>
+  </ni-cartesian-axis>
+</ni-cartesian-graph>
+```
+Multiple vertical and horizontal axes can be added to a graph and configured.
+
+Axes can be placed to the right, left and on top or bottom of a graph, can use a
+logarithmic scale if desired and can show time. A relative time format is supported
+along with the absolute time format.
+
+The minimum and maximum value of an axis can be specified. Autoscaling according
+to the data ranges dispayed is also possible.
+
+
+### ni-cartesian-axis properties
+
+**axis-ref** - an axis id used to bind plots to the axes. Default: ''
+
+**show** (boolean) - if true the axis will be visible. Default: false
+
+**label** (string) - the name of the axis. Default: '' 
+
+**axis-position** (string) - the position of the axis. Default: 'left'
+ Accepted values: 'top', 'bottom', 'left' and 'right'
+
+
+**show-label** (boolean) - if true the axis label will be visible.
+       Default: false 
+
+**minimum** (number) - the minimum axis value. Default: 0
+
+**maximum** (number) - the maximum axis value. Default: 1
+
+**auto-scale** (string) - if 'exact' or 'loose' the axis will adapt to the data
+       ranges of the plots assigned to that axis. if 'none', the axis will adapt to the
+       minimum and maximum options. For 'growexact' and 'growloose' the axis will adapt only when
+       the new data value is bigger than the old one. Default: 'auto'
+
+**log-scale** (boolean) - if true the axis will be a log axis. Default: false
+
+**format** (string) - the format of the tick labels. Default: ''
+TODO: document the format
+
+
+**show-tick-labels** (string) - which of the tick labels are visible.
+       Possible values: 'none', 'endpoints', 'major' and 'all'. Default: 'all'.
+       For 'endpoints' only the minimum and the maximum values will be visible
+       at the edges of the axis. To make some intermediary values visible use
+       'major', and 'all' to show all of them.
+
+**grid-lines** (boolean) - if true the grid lines for the axis will
+       be visible. Default: false
+
+**show-ticks** (boolean) - if true the tick lines for the axis will
+       be visible. A tick line is a short line which connects the tick label with
+       the axis. Default: false
+
+**show-minor-ticks** (boolean) - if true the minor tick lines for the axis
+       will be visible. Minor tick lines are short lines (half of the tick line
+       length) which subdivide the interval between tick lines in five intervals.
+       Default: false
+
+
+## ni-color-scale
+
+> A color scale added to an intensity graph is used to configure the color
+gradients.
+
+```html
+<ni-intensity-graph>
+  <ni-cartesian-axis ...></ni-cartesian-axis>
+  <ni-cartesian-axis ...></ni-cartesian-axis>
+  <ni-color-scale show show-label label="Color Scale" low-color="blue" high-color="red">
+  </ni-color-scale>
+</ni-intensity-graph>
+```
+
+A single color scale can be added to an intensity graph to visualize and control
+the maping from values to the color gradient displayed.
+
+Color scales are only supported by intensity graphs, when added to other types of
+webcharts they do nothing.
+
+The color gradients are described by an array of stops, for example this:
+
+```js
+[
+{"value":0,"color":"rgba(0,0,0,1)"},
+{"value":0.5,"color":"rgba(0,0,255,1)"},
+{"value":1,"color":"rgba(255,255,255,1)"}
+]
+```
+
+describes a color gradient going from black at the stop with the value 0, to
+blue at the stop with the value 0.5 and then to white at the stop with the value
+1.
+
+
+### ni-color-scale properties
+
+**label** (string) - the name of the color scale. Default: '' 
+
+**show** (boolean) - if true the color scale will be visible. Default: false 
+
+**show-label** (boolean) - if true the color scale label will be visible. Default: false 
+
+**axis-position** (string) - the position of the color scale. Default: 'right'.
+       Accepted values: *'left'*, *'right'* 
+
+**show-tick-labels** (string) - which of the tick labels are visible.
+       Possible values: 'none', 'endpoints', 'major' and 'all'. Default: 'all'.
+       For 'endpoints' only the minimum and the maximum values will be visible
+       at the edges of the axis. To make some intermediary values visible use
+       'major', and 'all' to show all of them.
+
+**high-color** (string) - the color assigned to the values bigger than
+       the color scale maximum. Default: '#ffffff'.
+       Accepted values: a CSS color string
+
+**low-color** (string) - the color assigned to the values smaller than
+       the color scale minimum. Default: '#000000'.
+       Accepted values: a CSS color string
+
+**markers** (string) - the color gradient used to map values to colorScaleAxis. Default: ''.
+       TODO: document the gradient format, better default value
+
+**auto-scale** (string) - if 'exact' the color gradient will strech to adapt to the
+       range of the data set provided. Default: 'auto'
+
+**minimum** (number) - the minimum axis value. Default: 0
+
+**maximum** (number) - the maximum axis value. Default: 1
+
+
+## ni-cartesian-plot
+
+> A custom element that, along with a nested ni-cartesian-plot-renderer describes
+the way a data plot is rendered.
+
+A plot is the graphic representation of a data set. A graph or chart can show
+simultaneously multiple data sets (plots). To customize how a data set, or plot
+is rendered use ni-cartesian-plot elements nested inside a graph or chart
+element.
+
+```html
+<ni-cartesian-graph>
+  <ni-cartesian-axis axis-ref="axis1ref" show axis-position="bottom"></ni-cartesian-axis>
+  <ni-cartesian-axis axis-ref="axis2ref" show axis-position="left"></ni-cartesian-axis>
+  <ni-cartesian-plot show label="plot 1" xaxis="axis1ref" yaxis="axis2ref">
+    add an ni-cartesian-plot-renderer here
+  </ni-cartesian-plot>
+</ni-cartesian-graph>
+```
+
+
+### ni-cartesian-plot properties 
+
+**show** (boolean) - if true the plot will be shown. Default: false 
+
+**label** (string) - the name of the plot. Default: '' 
+
+**xaxis** (string) - the X axis that this plot will use. Default: ''.
+       Accepted values: an axis-ref. In case an xaxis with the specified axis-ref
+       is not found the first xaxis is used
+
+**yaxis** (string) - the Y axis that this plot will use. Default: ''.
+       Accepted values: an axis-ref. In case an yaxis with the specified axis-ref
+       is not found the first yaxis is used
+
+**enable-hover** (boolean) - if true, when the mouse hovers close to a point on the plot
+       a tooltip with the point value will be shown 
+
+**hover-format** (string) - specifies the format of the text shown in the tooltip. TODO: document the format
+
+
+## ni-cartesian-plot-renderer
+
+> Describes the way a plot is rendered
+
+The four ways to render a plot are the line renderer, the area fill renderer,
+the points renderer and the bar renderer. You can combine these in any way you
+like for a single plot and different plots can have different renderers.
+
+The fastest one is the line renderer and this is the recomended one for large
+data sets and if you care about performance.
+
+The render can be further customized by using the renderer properties.
+
+
+### ni-cartesian-plot-renderer properties 
+
+**line-stroke** (string) - the color of the line drawn. Default: 'auto'.
+       Accepted values: a CSS color string, an empty string or 'auto'. If an empty string
+       is passed the line rendering for the plot is disabled. If 'auto' is passed a color
+       will be automatically assigned to the plot.
+       
+
+**line-width** (number) - the width of the line. Use 1 for maximum
+       performance as thicker lines can be slower, depending on the browser and
+       the graphic card used. Default: 1
+
+**line-style** (string) - the style of the line drawn. Default: 'solid'.
+       Accepted values: *'solid'*, *'dot'*, *'mediumdash'*, *'dashdot'* and *'largedash'*
+       
+
+**area-fill** (string) - the color of the area fill drawn under/over
+       the line. Default: ''.
+       Accepted values: a CSS color string, an empty string or auto. If an empty string
+       is passed the area fill for the plot is disabled. If 'auto' is passed a color
+       will be automatically assigned to the fill.
+       
+
+**area-base-line** (string) - determines the direction the area fill.
+Default: 'zero'. Accepted values:
+
+* 'zero': fill the line towards 0
+* '-infinity': fill the line towards -Infinity.
+* 'infinity': fill the line towards Infinity.
+
+
+**bar-fill** (string) - the color of the bars drawn. Default: ''.
+       Accepted values: a CSS color string, an empty string or auto. If an empty
+       string is passed the bars rendering for the plot is disabled. If 'auto'
+       is passed a color will be automatically assigned to the bars.
+       
+
+**point-color** (string) - the color of the points drawn. Default: ''.
+       Accepted values: a CSS color string, an empty string or auto. If an empty
+       string is passed the points rendering for the plot is disabled. If 'auto'
+       is passed a color will be automatically assigned to the points.
+       
+
+**point-size** (number) - the size of the points drawn. Default: 5.
+
+**point-shape** (string) - determines the shape of the points.
+       Default: 'ellipse'. Accepted values: 'ellipse', 'square', 'diamond',
+       'triangle', 'cross'
+       
+
+
+## ni-cursor
+
+> Add cursors to a graph.
+
+Sometimes you want to take a measurement off a graph you have made. Cursors allow
+you to do that.
+
+```html
+<ni-cartesian-graph>
+  <ni-cartesian-axis show grid-lines show-label label="Axis 1" axis-position='bottom'>
+  </ni-cartesian-axis>
+  <ni-cartesian-axis show grid-lines show-label label="Axis 2" axis-position='top'>
+  </ni-cartesian-axis>
+  <ni-cursor label="Cursor 1" show show-label snap-to-data cursor-color="#40d387"></ni-cursor>
+</ni-cartesian-graph>
+```
+Multiple cursors can be added to a graph and configured.
+
+
+### ni-cursor properties
+   
+
+**show** (boolean) - if true the cursor will be visible. Default: false
+
+**label** (string) - the label of the cursor. Default: '' 
+
+**show-label** (boolean) - if true the cursor label will be visible.
+       Default: false 
+
+**target-shape** (string) - the shape of cursor. Default: 'ellipse'.
+Accepted values: 'ellipse', 'square', 'diamond', 'triangle', 'cross'
+
+
+**color** (string) - the color of the cursor. Default: 'black'.
+Accepted values: a CSS color string
+
+
+**crosshair-style** (string) - the shape of crosshair. Default: 'both'.
+Accepted values: 'both', 'vertical', 'horizontal', 'none'
+
+
+**show-value** (boolean) - if true the coordinates of the cursor will
+       be visible. Default: false 
+
+**snap-to-data** (boolean) - if true the cursor will snap to data.
+       Default: false 
+
+**x** (number) - the x target coordinate of the cursor. This coordinate
+       is relative to the visible area of the graph, in the interval 0 to 1.
+       0 is on the left edge and 1 on the one to the right.
+       Default: 0.5 
+
+**y** (number) - the y target coordinate of the cursor. This coordinate
+       is relative to the visible area of the graph, in the interval 0 to 1.
+       0 is on the bottom edge and 1 on the top one.
+       Default: 0.5 
+
+**font-family** (string) - the font used for cursor label and values.
+       Default: 'sans-serif' 
+
+**font-size** (string) - the font size used for cursor label and values.
+       Default: '10px' 
+
+**font-style** (string) - the font style used for cursor label and values.
+       Default: '' 
+
+**font-size** (string) - the font weight used for cursor label and values.
+       Default: '10px' 
+
+TODO: clean up and document the events generated by cursors

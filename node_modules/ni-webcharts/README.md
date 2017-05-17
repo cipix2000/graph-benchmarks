@@ -1,0 +1,74 @@
+# Webcharts [![Build Status](https://travis-ci.com/ni-kismet/webcharts.svg?token=MpaGws1pj7G9qToNQ6dS&branch=master)](https://travis-ci.com/ni-kismet/webcharts) [![Coverage Status](https://coveralls.io/repos/github/ni-kismet/webcharts/badge.svg?branch=master&t=1DGKy8)](https://coveralls.io/github/ni-kismet/webcharts?branch=master)
+
+Webcharts
+
+> Web components for plotting engineering and scientific data with a focus on performance.
+
+
+Usage example:
+
+Import ni-webcharts
+
+```
+    npm install --save ni-webcharts
+```
+
+Add a graph to a webpage:
+
+```html
+<html>
+<head>
+    <link rel="stylesheet" href="node_modules/ni-webcharts/styles/webchartsLight.css" />
+    <link rel="import" href="node_modules/ni-webcharts/dist/webcharts.min.html"/>
+    <script type="text/javascript" src="node_modules/webcomponents-lite/webcomponents-lite.js"></script>
+</head>
+
+<body>
+    <ni-cartesian-graph value="[[0, 10, 200, 3, 40, 500, 6, 70, 800], [1, 2, 3, 4, 5]]">
+      <ni-cartesian-axis show label="Time" show-label axis-position="bottom"></ni-cartesian-axis>
+      <ni-cartesian-axis show label="Amplitude" show-label axis-position="left"></ni-cartesian-axis>
+      <ni-cartesian-plot show="true" label="Plot 1">
+        <ni-cartesian-plot-renderer line-width="1"></ni-cartesian-plot-renderer>
+      </ni-cartesian-plot>
+      <ni-cartesian-plot show label="Plot 2">
+        <ni-cartesian-plot-renderer line-width="1"></ni-cartesian-plot-renderer>
+      </ni-cartesian-plot>
+    </ni-cartesian-graph>
+</body>
+</html>
+```
+
+# Webcharts main elements
+
+**ni-cartesian-graph** is the element that allows you to shows graphs. Add one to a html page and it will be shown as a graph, rendering the data you pass to it in the *value* attribute. See the *Graph Data types formats* section for information on the data types supported. The graph is rendered according to the options passed in a series of webcharts components nested inside the main element.
+
+**ni-chart** is the element that allows you to show charts. The difference from a graph is that the chart has an internal buffer of historical values, called a HistoryBuffer.
+
+**ni-intensity-graph** is the element that allows you to show intensity graphs. An intensity graphs shows values arranged in 2d data structure as an image with the values represented according to a specified color gradient.
+
+## Webcharts nested elements
+
+**ni-cartesian-axis** is an element that adds a cartesian axis to one of the main elements.
+
+**ni-cartesian-plot** is an element that adds a plot description to one of the main elements.
+
+**ni-cartesian-plot-renderer** adds a plot renderer to a plot, specifying the way the data is rendered -  line color, line width, bars, points, fill and many other options.
+
+**ni-color-scale** adds a color scale to an intensity chart
+
+
+# Documentation
+
+Read the [API Documentation](docs/API.md).
+
+
+The documentation for the webcharts is written in markdown and is stored inline in the source code. The tool that extracts the documentation from the source files and updates the documents in the docs folder is invoked by typing:
+
+```
+npm run docs
+```
+
+# Version and Deployment
+- This package is versioned according to [semantic versioning](http://semver.org).
+- The version must be bumped using the `npm version` command (https://docs.npmjs.com/cli/version). This increments the version in package.json, creates a tag with the same version name, and commit both to the local repository.
+- Push the commit and tag using `git push --follow-tags`. With a passing CI this will automatically trigger a deployment to NPM.

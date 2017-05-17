@@ -1,0 +1,69 @@
+## ni-color-scale
+
+> A color scale added to an intensity graph is used to configure the color
+gradients.
+
+```html
+<ni-intensity-graph>
+  <ni-cartesian-axis ...></ni-cartesian-axis>
+  <ni-cartesian-axis ...></ni-cartesian-axis>
+  <ni-color-scale show show-label label="Color Scale" low-color="blue" high-color="red">
+  </ni-color-scale>
+</ni-intensity-graph>
+```
+
+A single color scale can be added to an intensity graph to visualize and control
+the maping from values to the color gradient displayed.
+
+Color scales are only supported by intensity graphs, when added to other types of
+webcharts they do nothing.
+
+The color gradients are described by an array of stops, for example this:
+
+```js
+[
+{"value":0,"color":"rgba(0,0,0,1)"},
+{"value":0.5,"color":"rgba(0,0,255,1)"},
+{"value":1,"color":"rgba(255,255,255,1)"}
+]
+```
+
+describes a color gradient going from black at the stop with the value 0, to
+blue at the stop with the value 0.5 and then to white at the stop with the value
+1.
+
+
+### ni-color-scale properties
+
+**label** (string) - the name of the color scale. Default: '' 
+
+**show** (boolean) - if true the color scale will be visible. Default: false 
+
+**show-label** (boolean) - if true the color scale label will be visible. Default: false 
+
+**axis-position** (string) - the position of the color scale. Default: 'right'.
+       Accepted values: *'left'*, *'right'* 
+
+**show-tick-labels** (string) - which of the tick labels are visible.
+       Possible values: 'none', 'endpoints', 'major' and 'all'. Default: 'all'.
+       For 'endpoints' only the minimum and the maximum values will be visible
+       at the edges of the axis. To make some intermediary values visible use
+       'major', and 'all' to show all of them.
+
+**high-color** (string) - the color assigned to the values bigger than
+       the color scale maximum. Default: '#ffffff'.
+       Accepted values: a CSS color string
+
+**low-color** (string) - the color assigned to the values smaller than
+       the color scale minimum. Default: '#000000'.
+       Accepted values: a CSS color string
+
+**markers** (string) - the color gradient used to map values to colorScaleAxis. Default: ''.
+       TODO: document the gradient format, better default value
+
+**auto-scale** (string) - if 'exact' the color gradient will strech to adapt to the
+       range of the data set provided. Default: 'auto'
+
+**minimum** (number) - the minimum axis value. Default: 0
+
+**maximum** (number) - the maximum axis value. Default: 1
